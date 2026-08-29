@@ -1,0 +1,4 @@
+{$CONTROLLER_DOMAIN} {
+  encode zstd gzip
+  reverse_proxy signal:8080
+}

@@ -1,0 +1,68 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+}
+
+p {
+  margin: 0 0 12px;
+}
+
+button,
+select,
+input {
+  font: inherit;
+}
+
+#start,
+#recenter,
+#guard {
+  width: 100%;
+  min-height: 48px;
+  margin-bottom: 12px;
+}
+
+#guard {
+  min-height: 28vh;
+  touch-action: none;
+  -webkit-touch-callout: none;
+}
+
+details {
+  margin-top: 20px;
+}
+
+fieldset {
+  margin: 12px 0;
+}
+
+.mapping-row,
+.axis-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.mapping-row label,
+.axis-row label {
+  width: 3rem;
+}
+
+.axis-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.axis-row output {
+  width: 3.5rem;
+  text-align: right;
+}
+
+.axis-step {
+  min-width: 40px;
+  min-height: 40px;
+}

@@ -1,0 +1,32 @@
+services:
+  signal:
+    build: .
+    restart: unless-stopped
+    environment:
+      PORT: "8080"
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:?set PUBLIC_BASE_URL}
+      HOST_KEY: ${HOST_KEY:?set HOST_KEY}
+    networks: [controller]
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    environment:
+      CONTROLLER_DOMAIN: ${CONTROLLER_DOMAIN:?set CONTROLLER_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [controller]
+    depends_on: [signal]
+
+networks:
+  controller:
+
+volumes:
+  caddy_data:
+  caddy_config:

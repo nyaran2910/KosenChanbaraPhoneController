@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#ffffff">
+  <title>チャンバラ コントローラー</title>
+  <link rel="stylesheet" href="/controller.css?v=mvp-v7">
+</head>
+<body>
+  <main>
+    <p>プレイヤー：<span id="player">--</span></p>
+    <button id="recenter" type="button" disabled>リセンター</button>
+    <button id="guard" type="button" disabled>ガード</button>
+    <button id="start" type="button">センサーを使う</button>
+    <details id="axis-panel">
+      <summary>軸調整</summary>
+      <fieldset>
+        <legend>軸の割当・動く方向（ゲーム側 ← スマホ側）</legend>
+        <div class="mapping-row">
+          <label for="axis-map-x">X ←</label>
+          <select class="axis-source" id="axis-map-x" data-output-axis="x">
+            <option value="x" selected>X</option>
+            <option value="y">Y</option>
+            <option value="z">Z</option>
+          </select>
+          <button class="direction-toggle" type="button" data-axis="x" aria-pressed="false">＋ 正方向</button>
+        </div>
+        <div class="mapping-row">
+          <label for="axis-map-y">Y ←</label>
+          <select class="axis-source" id="axis-map-y" data-output-axis="y">
+            <option value="x">X</option>
+            <option value="y">Y</option>
+            <option value="z" selected>Z</option>
+          </select>
+          <button class="direction-toggle" type="button" data-axis="y" aria-pressed="false">＋ 正方向</button>
+        </div>
+        <div class="mapping-row">
+          <label for="axis-map-z">Z ←</label>
+          <select class="axis-source" id="axis-map-z" data-output-axis="z">
+            <option value="x">X</option>
+            <option value="y" selected>Y</option>
+            <option value="z">Z</option>
+          </select>
+          <button class="direction-toggle" type="button" data-axis="z" aria-pressed="false">＋ 正方向</button>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>角度の微調整</legend>
+        <div class="axis-row">
+          <label for="axis-x">X</label>
+          <button class="axis-step" type="button" data-axis="x" data-step="-5" aria-label="Xを5度減らす">−</button>
+          <input id="axis-x" data-axis="x" type="range" min="-180" max="180" step="5" value="0">
+          <button class="axis-step" type="button" data-axis="x" data-step="5" aria-label="Xを5度増やす">＋</button>
+          <output id="axis-x-value" for="axis-x">0°</output>
+        </div>
+        <div class="axis-row">
+          <label for="axis-y">Y</label>
+          <button class="axis-step" type="button" data-axis="y" data-step="-5" aria-label="Yを5度減らす">−</button>
+          <input id="axis-y" data-axis="y" type="range" min="-180" max="180" step="5" value="0">
+          <button class="axis-step" type="button" data-axis="y" data-step="5" aria-label="Yを5度増やす">＋</button>
+          <output id="axis-y-value" for="axis-y">0°</output>
+        </div>
+        <div class="axis-row">
+          <label for="axis-z">Z</label>
+          <button class="axis-step" type="button" data-axis="z" data-step="-5" aria-label="Zを5度減らす">−</button>
+          <input id="axis-z" data-axis="z" type="range" min="-180" max="180" step="5" value="0">
+          <button class="axis-step" type="button" data-axis="z" data-step="5" aria-label="Zを5度増やす">＋</button>
+          <output id="axis-z-value" for="axis-z">0°</output>
+        </div>
+      </fieldset>
+    </details>
+  </main>
+  <script src="/controller.js?v=mvp-v7" defer></script>
+</body>
+</html>
