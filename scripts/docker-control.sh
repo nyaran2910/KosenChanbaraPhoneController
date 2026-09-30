@@ -31,7 +31,7 @@ show_status() {
 case "${1:-up}" in
   up)
     docker info >/dev/null 2>&1 || {
-      echo "Docker Desktopを起動してから、もう一度 make phone-controller を実行してください。" >&2
+      echo "Docker Desktopを起動してから、もう一度 make を実行してください。" >&2
       exit 1
     }
     echo "Dockerイメージを取得しています: $image"
