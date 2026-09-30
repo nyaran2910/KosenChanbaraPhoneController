@@ -2,12 +2,13 @@
 
 DOMAIN ?=
 ENV_FILE ?= .env
-UNITY_CONFIG ?= ../KosenChanbara/Assets/StreamingAssets/controller-connection.json
+UNITY_CONFIG ?= ../unity/Assets/StreamingAssets/controller-connection.json
+IMAGE ?= $(if $(PHONE_CONTROLLER_IMAGE),$(PHONE_CONTROLLER_IMAGE),nyaran336699/kosen-chanbara-phone-controller:latest)
 COMPOSE := $(shell if docker compose version >/dev/null 2>&1; then printf '%s' 'docker compose'; elif command -v docker-compose >/dev/null 2>&1; then printf '%s' 'docker-compose'; fi)
 
 export DOMAIN ENV_FILE UNITY_CONFIG
 
-.PHONY: local up stop down restart logs status production production-down production-logs production-status configure check
+.PHONY: local up stop down restart logs status docker-up docker-stop docker-status docker-logs production production-down production-logs production-status configure check
 
 local up:
 	@./scripts/local-control.sh start
@@ -23,6 +24,18 @@ logs:
 
 status:
 	@./scripts/local-control.sh status
+
+docker-up:
+	@PHONE_CONTROLLER_IMAGE=$(IMAGE) UNITY_CONFIG=$(UNITY_CONFIG) ./scripts/docker-control.sh up
+
+docker-stop:
+	@PHONE_CONTROLLER_IMAGE=$(IMAGE) UNITY_CONFIG=$(UNITY_CONFIG) ./scripts/docker-control.sh stop
+
+docker-status:
+	@PHONE_CONTROLLER_IMAGE=$(IMAGE) UNITY_CONFIG=$(UNITY_CONFIG) ./scripts/docker-control.sh status
+
+docker-logs:
+	@PHONE_CONTROLLER_IMAGE=$(IMAGE) UNITY_CONFIG=$(UNITY_CONFIG) ./scripts/docker-control.sh logs
 
 production: check configure
 	@$(COMPOSE) up -d --build
