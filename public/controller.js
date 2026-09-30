@@ -177,7 +177,7 @@
     }
     if (message.type === "rtc.candidate" && message.slot === slot) {
       const candidate = message.candidate;
-      if (!candidate?.candidate?.toLowerCase().includes(" typ host")) return;
+      if (!candidate?.candidate) return;
       if (state.remoteDescriptionSet && state.peer) await state.peer.addIceCandidate(candidate);
       else state.pendingCandidates.push(candidate);
       return;
@@ -188,7 +188,9 @@
   async function acceptOffer(sdp) {
     const earlyCandidates = state.pendingCandidates.splice(0);
     shutdownPeer();
-    const peer = new RTCPeerConnection({ iceServers: [] });
+    const peer = new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+    });
     state.peer = peer;
     state.remoteDescriptionSet = false;
     armConnectionTimeout();
@@ -196,7 +198,7 @@
     peer.addEventListener("icecandidate", event => {
       if (state.peer !== peer) return;
       const candidate = event.candidate;
-      if (!candidate || !candidate.candidate.toLowerCase().includes(" typ host")) return;
+      if (!candidate) return;
       sendSignal({ type: "rtc.candidate", slot, candidate: candidate.toJSON() });
     });
     peer.addEventListener("datachannel", event => {

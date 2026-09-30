@@ -350,7 +350,7 @@ function relayCandidate(target: WebSocket | undefined, slot: SlotId, value: unkn
   if (!value || typeof value !== "object") return;
   const candidate = value as Record<string, unknown>;
   const candidateText = asBoundedString(candidate.candidate, 4096);
-  if (!candidateText || !candidateText.toLowerCase().includes(" typ host")) return;
+  if (!candidateText) return;
   send(target, {
     type: "rtc.candidate",
     slot,
