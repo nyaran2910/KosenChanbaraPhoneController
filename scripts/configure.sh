@@ -2,7 +2,7 @@
 set -eu
 
 env_file=${ENV_FILE:-.env}
-unity_config=${UNITY_CONFIG:-../KosenChanbara/Assets/StreamingAssets/controller-connection.json}
+unity_config=${UNITY_CONFIG:-../unity/Assets/StreamingAssets/controller-connection.json}
 domain=${DOMAIN:-}
 host_key=
 env_tmp=

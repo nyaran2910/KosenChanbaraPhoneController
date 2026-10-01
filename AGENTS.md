@@ -12,7 +12,8 @@
 - 変更後は内容に応じて `npm test` と `npm run build` を実行する。
 - ローカル実行は `npm run dev`、ビルド済み実行は `npm start` を使う。
 - `node_modules`、`dist`、`.env`、ローカル証明書などの生成物・秘密情報をコミットしない。
-- Makefileが生成するUnity側接続設定は `../KosenChanbara/Assets/StreamingAssets/controller-connection.json` である。パスや形式を変更するときはUnity側も同じ作業で整合させる。
+- Makefileが生成するUnity側接続設定は `../unity/Assets/StreamingAssets/controller-connection.json` である。パスや形式を変更するときはUnity側も同じ作業で整合させる。
+- ローカル起動では、既存のtmuxサーバーにも接続設定の保存先・ポート・URL上書き・停止コマンドを明示的に渡す。起動済みでもUnity用設定を現在のサーバーのキーに同期する。
 
 ## 変更方針
 

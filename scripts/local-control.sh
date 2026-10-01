@@ -15,7 +15,12 @@ supervisor_pid_file="$state_dir/supervisor.pid"
 session_name=phone_controller_signal
 script_path="$root_dir/scripts/local-control.sh"
 port=${LOCAL_PORT:-8080}
-unity_config=${UNITY_CONFIG:-"$root_dir/../KosenChanbara/Assets/StreamingAssets/controller-connection.json"}
+unity_config=${UNITY_CONFIG:-"$root_dir/../unity/Assets/StreamingAssets/controller-connection.json"}
+case "$unity_config" in
+  /*) ;;
+  *) unity_config="$root_dir/$unity_config" ;;
+esac
+export UNITY_CONFIG="$unity_config" LOCAL_PORT="$port"
 wrangler="$root_dir/node_modules/.bin/wrangler"
 
 pid_is_running() {
@@ -119,9 +124,11 @@ public_health_is_ok() {
 }
 
 start_services() {
-  if pid_is_running "$server_pid_file" && pid_is_running "$tunnel_pid_file" && [ -s "$url_file" ]; then
+  if pid_is_running "$server_pid_file" && pid_is_running "$tunnel_pid_file" && [ -s "$url_file" ] && [ -s "$host_key_file" ]; then
+    write_unity_config "$(sed -n '1p' "$host_key_file")"
     echo "すでに起動しています。"
     show_status
+    echo "Unity設定を同期しました: $unity_config"
     return
   fi
 
@@ -196,7 +203,7 @@ start_services() {
       echo "起動しました。"
       echo "スマホ用URL: $public_url"
       echo "Unity設定: $unity_config"
-      echo "停止: make stop"
+      echo "停止: ${LOCAL_STOP_COMMAND:-make stop}"
       return
     fi
     sleep 0.5
@@ -236,9 +243,11 @@ supervise() {
 }
 
 start_detached() {
-  if pid_is_running "$server_pid_file" && pid_is_running "$tunnel_pid_file" && [ -f "$ready_file" ]; then
+  if pid_is_running "$server_pid_file" && pid_is_running "$tunnel_pid_file" && [ -f "$ready_file" ] && [ -s "$host_key_file" ]; then
+    write_unity_config "$(sed -n '1p' "$host_key_file")"
     echo "すでに起動しています。"
     show_status
+    echo "Unity設定を同期しました: $unity_config"
     return
   fi
 
@@ -249,7 +258,13 @@ start_detached() {
 
   if command -v tmux >/dev/null 2>&1; then
     tmux kill-session -t "$session_name" >/dev/null 2>&1 || true
-    tmux new-session -d -s "$session_name" "$script_path supervise"
+    # An existing tmux server does not inherit the caller's exported settings.
+    tmux new-session -d -s "$session_name" \
+      -e "UNITY_CONFIG=$unity_config" \
+      -e "LOCAL_PORT=$port" \
+      -e "UNITY_SIGNALING_URL=${UNITY_SIGNALING_URL:-}" \
+      -e "LOCAL_STOP_COMMAND=${LOCAL_STOP_COMMAND:-make stop}" \
+      "$script_path" supervise
   elif command -v screen >/dev/null 2>&1; then
     screen -S "$session_name" -X quit >/dev/null 2>&1 || true
     screen -DmS "$session_name" "$script_path" supervise
@@ -264,7 +279,7 @@ start_detached() {
       echo "起動しました。"
       echo "スマホ用URL: $(sed -n '1p' "$url_file")"
       echo "Unity設定: $unity_config"
-      echo "停止: make stop"
+      echo "停止: ${LOCAL_STOP_COMMAND:-make stop}"
       return
     fi
     sleep 0.25

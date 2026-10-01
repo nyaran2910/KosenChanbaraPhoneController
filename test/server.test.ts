@@ -49,12 +49,13 @@ test("serves health checks and rejects unsupported HTTP methods", async () => {
   await app.close();
 });
 
-test("creates two private slots and relays only host ICE candidates", async () => {
+test("creates two private slots and relays host and STUN ICE candidates", async t => {
   const app = createControllerServer({
     hostKey,
     publicBaseUrl: "https://controller.example.test",
     publicDir: path.resolve("public")
   });
+  t.after(() => app.close());
   app.server.listen(0, "127.0.0.1");
   await once(app.server, "listening");
   const address = app.server.address();
@@ -94,16 +95,19 @@ test("creates two private slots and relays only host ICE candidates", async () =
   }));
   assert.equal((await hostCandidate).type, "rtc.candidate");
 
+  const stunCandidate = nextMessage(host);
   phone.send(JSON.stringify({
     type: "rtc.candidate",
     slot: "p1",
     candidate: { candidate: "candidate:2 1 udp 1 203.0.113.8 9999 typ srflx", sdpMid: "0", sdpMLineIndex: 0 }
   }));
-  await expectNoMessage(host);
+  assert.deepEqual(await stunCandidate, {
+    type: "rtc.candidate", slot: "p1",
+    candidate: { candidate: "candidate:2 1 udp 1 203.0.113.8 9999 typ srflx", sdpMid: "0", sdpMLineIndex: 0 }
+  });
 
   phone.close();
   host.close();
-  await app.close();
 });
 
 test("rejects an invalid host secret", async () => {
@@ -188,21 +192,6 @@ async function nextMessages(socket: WebSocket, count: number): Promise<any[]> {
       socket.off("message", onMessage);
       resolve(messages);
     };
-    socket.on("message", onMessage);
-  });
-}
-
-async function expectNoMessage(socket: WebSocket, durationMs = 75): Promise<void> {
-  await new Promise<void>((resolve, reject) => {
-    const onMessage = (data: WebSocket.RawData) => {
-      clearTimeout(timer);
-      socket.off("message", onMessage);
-      reject(new Error(`Unexpected message: ${data.toString()}`));
-    };
-    const timer = setTimeout(() => {
-      socket.off("message", onMessage);
-      resolve();
-    }, durationMs);
     socket.on("message", onMessage);
   });
 }
